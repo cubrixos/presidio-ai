@@ -9,13 +9,15 @@ ENV PIP_NO_CACHE_DIR=1
 ENV ANALYZER_CONF_FILE=${ANALYZER_CONF_FILE}
 ENV RECOGNIZER_REGISTRY_CONF_FILE=${RECOGNIZER_REGISTRY_CONF_FILE}
 ENV NLP_CONF_FILE=${NLP_CONF_FILE}
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # Set working directory
 WORKDIR /usr/bin/${NAME}
 
 # Install essential build tools and Poetry
 RUN apt-get update && apt-get install -y build-essential curl \
-  && curl -sSL https://install.python-poetry.org | python3 - \
+  && curl -sSL https://install.python-poetry.org | python3 - -- --install-dir $POETRY_HOME \
   && apt-get clean
 
 # Copy configuration files
