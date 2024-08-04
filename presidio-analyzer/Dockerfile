@@ -17,7 +17,9 @@ WORKDIR /usr/bin/${NAME}
 
 # Install essential build tools and Poetry
 RUN apt-get update && apt-get install -y build-essential curl \
-  && curl -sSL https://install.python-poetry.org | python3 - -- --path $POETRY_HOME \
+  && curl -sSL https://install.python-poetry.org | python3 - \
+  && mv /root/.poetry /opt/poetry \
+  && ln -s /opt/poetry/bin/poetry /usr/bin/poetry \
   && apt-get clean
 
 # Copy configuration files
