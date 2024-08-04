@@ -1,3 +1,4 @@
+# Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
 # Define build arguments and environment variables
@@ -9,43 +10,32 @@ ENV PIP_NO_CACHE_DIR=1
 ENV ANALYZER_CONF_FILE=${ANALYZER_CONF_FILE}
 ENV RECOGNIZER_REGISTRY_CONF_FILE=${RECOGNIZER_REGISTRY_CONF_FILE}
 ENV NLP_CONF_FILE=${NLP_CONF_FILE}
-ENV POETRY_HOME="/root/.local/share/pypoetry"
-ENV PATH="$POETRY_HOME/bin:$PATH"
 
-# Set working directory
+# Set the working directory
 WORKDIR /usr/bin/${NAME}
 
-# Install essential build tools and Poetry
-RUN apt-get update && apt-get install -y build-essential curl \
-  && curl -sSL https://install.python-poetry.org | python3 - \
-  && apt-get clean
-
-# Verify Poetry installation
-RUN poetry --version
-
-# Copy configuration files
+# Copy the configuration files
 COPY ${ANALYZER_CONF_FILE} ./
 COPY ${RECOGNIZER_REGISTRY_CONF_FILE} ./
 COPY ${NLP_CONF_FILE} ./
 
-# Copy project files
-COPY pyproject.toml poetry.lock* ./
-
-# Install project dependencies including Flask
-RUN poetry install --no-root -E server
-
-# Verify Flask installation
-RUN poetry run python -c "import flask; print('Flask is installed')"
-
-# Copy the rest of the application files
+# Copy the current directory contents into the container at /app
 COPY . .
 
-# Install NLP models specified in NLP_CONF_FILE
-COPY install_nlp_models.py ./
-RUN poetry run python install_nlp_models.py --conf_file ${NLP_CONF_FILE}
+# Upgrade pip to the latest version
+RUN pip install --upgrade pip
+
+# Increase pip's default timeout
+RUN pip config set global.timeout 1000
+
+# Install the necessary libraries
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Verify Flask installation
+RUN python -c "import flask; print('Flask is installed')"
 
 # Expose the port that the app runs on
 EXPOSE 8080
 
 # Command to run the application
-CMD ["poetry", "run", "python", "app.py", "--host", "0.0.0.0"]
+CMD ["python", "app.py", "--host", "0.0.0.0"]
