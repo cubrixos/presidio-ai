@@ -1,34 +1,43 @@
 FROM python:3.9-slim
 
+# Define build arguments and environment variables
 ARG NAME
 ARG NLP_CONF_FILE=presidio_analyzer/conf/default.yaml
 ARG ANALYZER_CONF_FILE=presidio_analyzer/conf/default_analyzer.yaml
 ARG RECOGNIZER_REGISTRY_CONF_FILE=presidio_analyzer/conf/default_recognizers.yaml
 ENV PIP_NO_CACHE_DIR=1
-
 ENV ANALYZER_CONF_FILE=${ANALYZER_CONF_FILE}
 ENV RECOGNIZER_REGISTRY_CONF_FILE=${RECOGNIZER_REGISTRY_CONF_FILE}
 ENV NLP_CONF_FILE=${NLP_CONF_FILE}
 
-COPY ${ANALYZER_CONF_FILE} /usr/bin/${NAME}/${ANALYZER_CONF_FILE}
-COPY ${RECOGNIZER_REGISTRY_CONF_FILE} /usr/bin/${NAME}/${RECOGNIZER_REGISTRY_CONF_FILE}
-COPY ${NLP_CONF_FILE} /usr/bin/${NAME}/${NLP_CONF_FILE}
-
+# Set working directory
 WORKDIR /usr/bin/${NAME}
 
-# Install essential build tools
-RUN apt-get update \
-  && apt-get install -y build-essential
+# Install essential build tools and Poetry
+RUN apt-get update && apt-get install -y build-essential curl \
+  && curl -sSL https://install.python-poetry.org | python3 - \
+  && apt-get clean
 
-COPY ./pyproject.toml /usr/bin/${NAME}/
-COPY ./README.md /usr/bin/${NAME}/
+# Copy configuration files
+COPY ${ANALYZER_CONF_FILE} ./
+COPY ${RECOGNIZER_REGISTRY_CONF_FILE} ./
+COPY ${NLP_CONF_FILE} ./
 
-RUN pip install poetry && poetry install --no-root --only=main -E server
-# install nlp models specified in NLP_CONF_FILE
-COPY ./install_nlp_models.py /usr/bin/${NAME}/
+# Copy project files
+COPY pyproject.toml poetry.lock* ./
 
+# Install project dependencies including Flask
+RUN poetry install --no-root -E server
+
+# Copy the rest of the application files
+COPY . .
+
+# Install NLP models specified in NLP_CONF_FILE
+COPY install_nlp_models.py ./
 RUN poetry run python install_nlp_models.py --conf_file ${NLP_CONF_FILE}
 
-COPY . /usr/bin/${NAME}/
+# Expose the port that the app runs on
 EXPOSE 8080
-CMD poetry run python app.py --host 0.0.0.0
+
+# Command to run the application
+CMD ["poetry", "run", "python", "app.py", "--host", "0.0.0.0"]
