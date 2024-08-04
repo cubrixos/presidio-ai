@@ -29,6 +29,9 @@ COPY pyproject.toml poetry.lock* ./
 # Install project dependencies including Flask
 RUN poetry install --no-root -E server
 
+# Verify Flask installation
+RUN poetry run python -c "import flask; print('Flask is installed')"
+
 # Copy the rest of the application files
 COPY . .
 
