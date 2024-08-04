@@ -11,7 +11,7 @@ from flask import Flask, Response, jsonify, request
 from presidio_analyzer import AnalyzerEngine, AnalyzerEngineProvider, AnalyzerRequest
 from werkzeug.exceptions import HTTPException
 
-DEFAULT_PORT = "3000"
+DEFAULT_PORT = "8080"
 
 LOGGING_CONF_FILE = "logging.ini"
 

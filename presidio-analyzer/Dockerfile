@@ -30,5 +30,5 @@ COPY ./install_nlp_models.py /usr/bin/${NAME}/
 RUN poetry run python install_nlp_models.py --conf_file ${NLP_CONF_FILE}
 
 COPY . /usr/bin/${NAME}/
-EXPOSE ${PORT}
+EXPOSE 8080
 CMD poetry run python app.py --host 0.0.0.0
