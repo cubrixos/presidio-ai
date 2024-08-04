@@ -4,25 +4,29 @@ FROM python:3.9-slim
 ARG NAME
 ENV PIP_NO_CACHE_DIR=1
 
-# Set working directory
+# Set the working directory
 WORKDIR /usr/bin/${NAME}
 
-# Install essential build tools and Poetry
-RUN apt-get update && apt-get install -y build-essential curl \
-  && curl -sSL https://install.python-poetry.org | python3 - \
-  && apt-get clean
-
-# Copy project files
-COPY pyproject.toml poetry.lock* ./
-
-# Install project dependencies including Flask
-RUN poetry install --no-root -E server
-
-# Copy the rest of the application files
+# Copy the current directory contents into the container
 COPY . .
+
+# Upgrade pip to the latest version
+RUN pip install --upgrade pip
+
+# Increase pip's default timeout
+RUN pip config set global.timeout 1000
+
+# Install the necessary libraries
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Verify Flask installation
+RUN python -c "import flask; print('Flask is installed')"
+
+# Log installed packages
+RUN pip list
+
+# Verify packages in runtime environment
+CMD ["sh", "-c", "pip list && python -c 'import flask; print(\"Flask is installed\")' && python app.py --host 0.0.0.0"]
 
 # Expose the port that the app runs on
 EXPOSE 8080
-
-# Command to run the application
-CMD ["poetry", "run", "python", "app.py", "--host", "0.0.0.0"]
