@@ -1,5 +1,9 @@
 FROM python:3.9-slim
 
+# Set environment variables
+ENV ANALYZER_URL=https://presidio-analyzer-nrztwvtmga-uc.a.run.app/analyze
+ENV ANONYMIZER_URL=https://presidio-anonymizer-nrztwvtmga-uc.a.run.app/anonymize
+
 # Set the working directory
 WORKDIR /usr/src/app
 
