@@ -142,7 +142,7 @@ def integrate():
             "analyzer_results": analyzer_results,
             "anonymized_text": anonymizer_results['text'],
             "gpt4_analysis": gpt4_analysis,
-            "logs": log_stream.getvalue()
+            "gpt4_recommendations": gpt4_analysis  # Pass the analysis/recommendations to the template
         })
 
     except requests.exceptions.RequestException as e:
