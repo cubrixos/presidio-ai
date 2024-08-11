@@ -4,16 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Submit Your Log for Analysis</h1>
     <form action="/submit-log" method="post">
-        <textarea name="log" rows="10" cols="50" placeholder="Enter your log here..."></textarea><br><br>
+        <textarea name="log" placeholder="Enter your log here..."></textarea><br><br>
         <button type="submit">Analyze Log</button>
     </form>
+
     {% if result %}
-    <h2>Analysis Result:</h2>
-    <pre>{{ result | tojson(indent=2) }}</pre>
+    <div class="result">
+        <h2>Analysis Result:</h2>
+
+        <h3>Entities Detected:</h3>
+        <ul>
+        {% for item in result.analyzer_results.items %}
+            <li>
+                <strong>Type:</strong> {{ item.entity_type }} <br>
+                <strong>Text:</strong> {{ item.text }} <br>
+                <strong>Position:</strong> Start: {{ item.start }}, End: {{ item.end }} <br>
+                <strong>Operator:</strong> {{ item.operator }}
+            </li>
+        {% endfor %}
+        </ul>
+
+        <h3>Anonymized Text:</h3>
+        <pre>{{ result.anonymized_text }}</pre>
+
+        <h3>GPT-4 Analysis:</h3>
+        <pre>{{ result.gpt4_analysis }}</pre>
+    </div>
     {% endif %}
 </body>
 </html>
