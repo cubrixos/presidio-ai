@@ -148,10 +148,12 @@ def integrate():
             chat_response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that analyzes anonymized log data."},
-                    {"role": "user", "content": gpt4_request}
+                    {"role": "system",
+                     "content": "You are an expert in analyzing logs and providing recommendations based on the log data."},
+                    {"role": "user",
+                     "content": f"Please analyze the following anonymized log data and provide your insights: {gpt4_request}"}
                 ],
-                max_tokens=150
+                max_tokens=500  # Increased token limit for longer responses
             )
             gpt4_analysis = chat_response['choices'][0]['message']['content'].strip()
             logging.info(f"GPT-4 analysis result: {gpt4_analysis}")
