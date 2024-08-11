@@ -53,8 +53,11 @@ def index():
 
 @app.route('/submit-log', methods=['POST'])
 def submit_log():
+    # Ensure result is always initialized
+    result = {"submitted_log": None, "analyzer_results": None, "anonymizer_results": None, "gpt4_analysis": None, "logs": None, "error": None, "details": None}
+
     log = request.form.get('log')
-    result = {"submitted_log": log}
+    result["submitted_log"] = log
 
     if not log:
         logging.info("No log submitted. Redirecting to index.")
@@ -82,6 +85,8 @@ def submit_log():
         result["details"] = str(e)
 
     result['logs'] = log_stream.getvalue()
+
+    logging.info(f"Final result to be passed to template: {result}")
     return render_template('index.html', result=result)
 
 @app.route('/integrate', methods=['POST'])
