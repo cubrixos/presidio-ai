@@ -63,30 +63,30 @@
     {% if result %}
     <div class="section">
         <h3>Submitted Log</h3>
-        <pre>{{ result.submitted_log | default('No log submitted') }}</pre>
+        <pre>{{ result.submitted_log or 'No log submitted yet.' }}</pre>
     </div>
 
     {% if result.error %}
     <div class="section error">
         <h3>Error</h3>
         <p>{{ result.error }}</p>
-        <p>Details: {{ result.details | default('No additional details') }}</p>
+        <p>Details: {{ result.details }}</p>
     </div>
     {% else %}
     <div class="two-columns">
         <div class="column">
             <h3>Analyzer Request</h3>
             <strong>Request Sent:</strong>
-            <pre>{{ result.analyzer_request | default('No request sent') }}</pre>
+            <pre>{{ result.analyzer_request or 'No request sent.' }}</pre>
             <strong>Response Received:</strong>
-            <pre>{{ result.analyzer_results | default('No response received') }}</pre>
+            <pre>{{ result.analyzer_results or 'No response received.' }}</pre>
         </div>
         <div class="column">
             <h3>Anonymizer Request</h3>
             <strong>Request Sent:</strong>
-            <pre>{{ result.anonymizer_request | default('No request sent') }}</pre>
+            <pre>{{ result.anonymizer_request or 'No request sent.' }}</pre>
             <strong>Response Received:</strong>
-            <pre>{{ result.anonymized_text | default('No response received') }}</pre>
+            <pre>{{ result.anonymized_text or 'No response received.' }}</pre>
         </div>
     </div>
 
@@ -94,13 +94,13 @@
         <div class="column">
             <h3>GPT-4 Request</h3>
             <strong>Request Sent:</strong>
-            <pre>{{ result.gpt4_request | default('No request sent') }}</pre>
+            <pre>{{ result.gpt4_request or 'No request sent.' }}</pre>
             <strong>Response Received:</strong>
-            <pre>{{ result.gpt4_analysis | default('No response received') }}</pre>
+            <pre>{{ result.gpt4_analysis or 'No response received.' }}</pre>
         </div>
         <div class="column">
             <h3>Recommendations</h3>
-            <pre>{{ result.gpt4_recommendations | default('No recommendations available') }}</pre>
+            <pre>{{ result.gpt4_recommendations or 'No recommendations available.' }}</pre>
         </div>
     </div>
     {% endif %}
@@ -108,7 +108,8 @@
 
     <div class="logs">
         <h3>Processing Logs</h3>
-        <pre>{{ result.logs | default('No logs available') }}</pre>
+        <pre>{{ result.logs or 'No logs available.' }}</pre>
     </div>
 </body>
 </html>
+
