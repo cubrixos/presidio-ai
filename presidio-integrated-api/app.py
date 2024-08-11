@@ -97,6 +97,13 @@ def integrate():
             return jsonify({"error": "Text is required"}), 400
 
         # Analyzer request and timing
+        analyzer_payload = {
+            "text": text,
+            "language": language,
+            "analyzer_config": {
+                "entities": entities
+            }
+        }
         start_time = time.time()
         logging.info(f"Sending text to analyzer: {analyzer_payload}")
         analyzer_response = requests.post(ANALYZER_URL, json=analyzer_payload, timeout=30)
@@ -107,6 +114,18 @@ def integrate():
         logging.info(f"Time taken for analyzer request: {end_time - start_time} seconds")
 
         # Anonymizer request and timing
+        anonymizer_payload = {
+            "text": text,
+            "anonymizer_config": {
+                "operators": {
+                    "DEFAULT": {
+                        "type": "replace",
+                        "new_value": "<REDACTED>"
+                    }
+                }
+            },
+            "analyzer_results": analyzer_results
+        }
         start_time = time.time()
         logging.info(f"Sending results to anonymizer: {anonymizer_payload}")
         anonymizer_response = requests.post(ANONYMIZER_URL, json=anonymizer_payload, timeout=30)
