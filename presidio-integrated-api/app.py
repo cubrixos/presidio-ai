@@ -89,22 +89,25 @@ def integrate():
         anonymizer_response.raise_for_status()
         anonymizer_results = anonymizer_response.json()
 
-        # Step 3: Send the Anonymized Log to OpenAI Codex for Analysis
+        # Step 3: Send the Anonymized Log to GPT-4 for Analysis
         try:
-            codex_response = openai.Completion.create(
-                engine="davinci-codex",
-                prompt=anonymizer_results['text'],
+            chat_response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that analyzes anonymized log data."},
+                    {"role": "user", "content": anonymizer_results['text']}
+                ],
                 max_tokens=150
             )
-            codex_analysis = codex_response.choices[0].text.strip()
+            gpt4_analysis = chat_response['choices'][0]['message']['content'].strip()
         except Exception as e:
-            return jsonify({"error": "Codex analysis failed", "details": str(e)}), 500
+            return jsonify({"error": "GPT-4 analysis failed", "details": str(e)}), 500
 
         # Combine and return the results
         return jsonify({
             "analyzer_results": analyzer_results,
             "anonymized_text": anonymizer_results['text'],
-            "codex_analysis": codex_analysis
+            "gpt4_analysis": gpt4_analysis
         })
 
     except requests.exceptions.RequestException as e:
@@ -114,4 +117,3 @@ def integrate():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
-
