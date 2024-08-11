@@ -43,7 +43,13 @@ DEFAULT_ENTITIES = [
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    try:
+        logging.info("Rendering the index page.")
+        return render_template('index.html')
+    except Exception as e:
+        logging.error(f"Failed to render the index page: {e}")
+        return f"Internal Server Error: {e}", 500
+
 
 @app.route('/submit-log', methods=['POST'])
 def submit_log():
