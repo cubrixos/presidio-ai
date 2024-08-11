@@ -43,37 +43,34 @@ DEFAULT_ENTITIES = [
 def index():
     return render_template('index.html')
 
+
 @app.route('/submit-log', methods=['POST'])
 def submit_log():
     log = request.form.get('log')
+    result = {"submitted_log": log}
+
     if not log:
         logging.info("No log submitted. Redirecting to index.")
         return redirect(url_for('index'))
 
     try:
-        # Log the received log data
         logging.info(f"Received log: {log}")
 
         # Call the integrate endpoint with the submitted log
         response = requests.post(INTEGRATE_URL, json={"text": log}, timeout=15)
         response.raise_for_status()
-        result = response.json()
+        result.update(response.json())
 
-        # Log the result from the integrate endpoint
         logging.info(f"Received result from integrate endpoint: {result}")
 
     except requests.exceptions.RequestException as e:
         logging.error(f"Request to integrate endpoint failed: {e}")
-        result = {
-            "error": "Failed to process the log.",
-            "details": str(e),
-            "logs": log_stream.getvalue()
-        }
+        result["error"] = "Failed to process the log."
+        result["details"] = str(e)
 
-    # Add the logs to the result before rendering the template
     result['logs'] = log_stream.getvalue()
-
     return render_template('index.html', result=result)
+
 
 @app.route('/integrate', methods=['POST'])
 def integrate():
@@ -122,12 +119,13 @@ def integrate():
 
         # Step 3: Send the Anonymized Log to GPT-4 for Analysis
         try:
+            gpt4_request = anonymizer_results['text']
             logging.info("Sending anonymized text to GPT-4 for analysis.")
             chat_response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant that analyzes anonymized log data."},
-                    {"role": "user", "content": anonymizer_results['text']}
+                    {"role": "user", "content": gpt4_request}
                 ],
                 max_tokens=150
             )
@@ -137,12 +135,13 @@ def integrate():
             logging.error(f"GPT-4 analysis failed: {e}")
             return jsonify({"error": "GPT-4 analysis failed", "details": str(e)}), 500
 
-        # Combine and return the results
         return jsonify({
             "analyzer_results": analyzer_results,
+            "anonymizer_request": anonymizer_payload,
             "anonymized_text": anonymizer_results['text'],
+            "gpt4_request": gpt4_request,
             "gpt4_analysis": gpt4_analysis,
-            "gpt4_recommendations": gpt4_analysis  # Pass the analysis/recommendations to the template
+            "gpt4_recommendations": gpt4_analysis
         })
 
     except requests.exceptions.RequestException as e:
@@ -151,6 +150,7 @@ def integrate():
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An unexpected error occurred", "details": str(e), "logs": log_stream.getvalue()}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

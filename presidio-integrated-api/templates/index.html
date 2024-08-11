@@ -8,11 +8,21 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            line-height: 1.6;
         }
         textarea {
             width: 100%;
-            height: 150px;
+            height: 100px;
             margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h3 {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
         }
         pre {
             background-color: #f4f4f4;
@@ -20,76 +30,67 @@
             border-radius: 5px;
             overflow-x: auto;
         }
-        .result {
-            margin-top: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 10px;
-        }
         .error {
             color: red;
             font-weight: bold;
         }
-        .log {
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
-    <h1>Submit Your Log for Analysis</h1>
-    <form action="/submit-log" method="post">
-        <textarea name="log" placeholder="Enter your log here..."></textarea><br><br>
-        <button type="submit">Analyze Log</button>
-    </form>
+    <h1>Log Analyzer</h1>
+
+    <div class="section">
+        <h3>Input Log</h3>
+        <form action="/submit-log" method="post">
+            <textarea name="log" placeholder="Enter your log here..."></textarea><br>
+            <button type="submit">Analyze Log</button>
+        </form>
+    </div>
 
     {% if result %}
-    <div class="result">
-        {% if result.error %}
-        <p class="error">Error: {{ result.error }}</p>
-        <p>Details: {{ result.details }}</p>
-        {% else %}
-        <h2>Analysis Result:</h2>
-
-        {% if result.analyzer_results %}
-        <h3>Entities Detected:</h3>
-        <ul>
-        {% for item in result.analyzer_results.items %}
-            <li>
-                <strong>Type:</strong> {{ item.entity_type }} <br>
-                <strong>Text:</strong> {{ item.text }} <br>
-                <strong>Position:</strong> Start: {{ item.start }}, End: {{ item.end }} <br>
-                <strong>Operator:</strong> {{ item.operator }}
-            </li>
-        {% endfor %}
-        </ul>
-        {% else %}
-        <p>No analyzer results available.</p>
-        {% endif %}
-
-        <h3>Anonymized Text:</h3>
-        <pre>{{ result.anonymized_text }}</pre>
-
-        <h3>GPT-4 Analysis:</h3>
-        <pre>{{ result.gpt4_analysis }}</pre>
-
-        <h3>GPT-4 Recommendations:</h3>
-        <pre>{{ result.gpt4_recommendations }}</pre>
-        {% endif %}
+    <div class="section">
+        <h3>Submitted Log</h3>
+        <pre>{{ result.submitted_log }}</pre>
     </div>
 
-    {% if result.logs %}
-    <div class="log">
-        <h3>Processing Logs:</h3>
-        <pre>{{ result.logs }}</pre>
+    {% if result.error %}
+    <div class="section error">
+        <h3>Error</h3>
+        <p>{{ result.error }}</p>
+        <p>Details: {{ result.details }}</p>
+    </div>
+    {% else %}
+    <div class="section">
+        <h3>Analyzer Request & Response</h3>
+        <strong>Request Sent:</strong>
+        <pre>{{ result.analyzer_request }}</pre>
+        <strong>Response Received:</strong>
+        <pre>{{ result.analyzer_results }}</pre>
+    </div>
+
+    <div class="section">
+        <h3>Anonymizer Request & Response</h3>
+        <strong>Request Sent:</strong>
+        <pre>{{ result.anonymizer_request }}</pre>
+        <strong>Response Received:</strong>
+        <pre>{{ result.anonymized_text }}</pre>
+    </div>
+
+    <div class="section">
+        <h3>GPT-4 Request & Response</h3>
+        <strong>Request Sent:</strong>
+        <pre>{{ result.gpt4_request }}</pre>
+        <strong>Response Received:</strong>
+        <pre>{{ result.gpt4_analysis }}</pre>
+        <strong>Recommendations:</strong>
+        <pre>{{ result.gpt4_recommendations }}</pre>
     </div>
     {% endif %}
+
+    <div class="section">
+        <h3>Processing Logs</h3>
+        <pre>{{ result.logs }}</pre>
+    </div>
     {% endif %}
 </body>
 </html>
