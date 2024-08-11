@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Analyzer</title>
+</head>
+<body>
+    <h1>Submit Your Log for Analysis</h1>
+    <form action="/submit-log" method="post">
+        <textarea name="log" rows="10" cols="50" placeholder="Enter your log here..."></textarea><br><br>
+        <button type="submit">Analyze Log</button>
+    </form>
+    {% if result %}
+    <h2>Analysis Result:</h2>
+    <pre>{{ result | tojson(indent=2) }}</pre>
+    {% endif %}
+</body>
+</html>
+

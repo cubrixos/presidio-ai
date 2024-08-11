@@ -3,6 +3,9 @@ FROM python:3.9-slim
 # Set environment variables
 ENV ANALYZER_URL=https://presidio-analyzer-nrztwvtmga-uc.a.run.app/analyze
 ENV ANONYMIZER_URL=https://presidio-anonymizer-nrztwvtmga-uc.a.run.app/anonymize
+ENV INTEGRATE_URL=https://presidio-integrated-api-nrztwvtmga-wl.a.run.app/integrate
+ENV OPENAI_API_KEY=OPENAI_API_KEY
+
 
 # Set the working directory
 WORKDIR /usr/src/app
