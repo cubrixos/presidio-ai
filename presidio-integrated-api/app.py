@@ -148,4 +148,9 @@ def integrate():
     except requests.exceptions.RequestException as e:
         logging.error(f"Request failed: {e}")
         return jsonify({"error": "Request failed", "details": str(e), "logs": log_stream.getvalue()}), 500
-    except
+    except Exception as e:
+        logging.error(f"An unexpected error occurred: {e}")
+        return jsonify({"error": "An unexpected error occurred", "details": str(e), "logs": log_stream.getvalue()}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
