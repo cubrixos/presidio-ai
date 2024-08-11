@@ -30,6 +30,10 @@
         li {
             margin-bottom: 10px;
         }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -41,8 +45,13 @@
 
     {% if result %}
     <div class="result">
+        {% if result.error %}
+        <p class="error">Error: {{ result.error }}</p>
+        <p>Details: {{ result.details }}</p>
+        {% else %}
         <h2>Analysis Result:</h2>
 
+        {% if result.analyzer_results %}
         <h3>Entities Detected:</h3>
         <ul>
         {% for item in result.analyzer_results.items %}
@@ -54,14 +63,17 @@
             </li>
         {% endfor %}
         </ul>
+        {% else %}
+        <p>No analyzer results available.</p>
+        {% endif %}
 
         <h3>Anonymized Text:</h3>
         <pre>{{ result.anonymized_text }}</pre>
 
         <h3>GPT-4 Analysis:</h3>
         <pre>{{ result.gpt4_analysis }}</pre>
+        {% endif %}
     </div>
     {% endif %}
 </body>
 </html>
-

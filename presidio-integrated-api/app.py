@@ -43,9 +43,16 @@ def submit_log():
     if not log:
         return redirect(url_for('index'))
 
-    # Call the integrate endpoint with the submitted log
-    response = requests.post(INTEGRATE_URL, json={"text": log})
-    result = response.json()
+    try:
+        # Call the integrate endpoint with the submitted log
+        response = requests.post(INTEGRATE_URL, json={"text": log}, timeout=15)
+        response.raise_for_status()
+        result = response.json()
+    except requests.exceptions.RequestException as e:
+        result = {
+            "error": "Failed to process the log.",
+            "details": str(e)
+        }
 
     return render_template('index.html', result=result)
 
@@ -68,7 +75,7 @@ def integrate():
                 "entities": entities
             }
         }
-        analyzer_response = requests.post(ANALYZER_URL, json=analyzer_payload)
+        analyzer_response = requests.post(ANALYZER_URL, json=analyzer_payload, timeout=10)
         analyzer_response.raise_for_status()
         analyzer_results = analyzer_response.json()
 
@@ -85,7 +92,7 @@ def integrate():
             },
             "analyzer_results": analyzer_results
         }
-        anonymizer_response = requests.post(ANONYMIZER_URL, json=anonymizer_payload)
+        anonymizer_response = requests.post(ANONYMIZER_URL, json=anonymizer_payload, timeout=10)
         anonymizer_response.raise_for_status()
         anonymizer_results = anonymizer_response.json()
 
