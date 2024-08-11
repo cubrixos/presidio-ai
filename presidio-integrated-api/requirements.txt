@@ -1,3 +1,5 @@
-flask
-requests
-openai
+flask>=1.1
+requests>=2.25.1
+openai>=1.0.0
+
+

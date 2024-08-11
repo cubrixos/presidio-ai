@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, stream=log_stream, format='%(asctime)s -
 # Environment variables
 ANALYZER_URL = os.getenv("ANALYZER_URL", "https://presidio-analyzer-nrztwvtmga-uc.a.run.app/analyze")
 ANONYMIZER_URL = os.getenv("ANONYMIZER_URL", "https://presidio-anonymizer-nrztwvtmga-uc.a.run.app/anonymize")
-INTEGRATE_URL = os.getenv("INTEGRATE_URL", "https://presidio-integrated-api-nrztwvtmga-wl.a.run.app/integrate")
+INTEGRATE_URL = os.getenv("INTEGRATE_URL", "https://presidio-integrated-api-nrztwvtmga-uc.a.run.app/integrate")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Set OpenAI API key
