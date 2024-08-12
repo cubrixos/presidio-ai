@@ -148,15 +148,22 @@ def integrate():
         try:
             gpt4_request = anonymizer_results['text']
             logging.info("Sending anonymized text to GPT-4 for analysis.")
+            system_prompt = {
+                "role": "system",
+                "content": "You are a highly intelligent and versatile assistant capable of analyzing data, providing code fixes, offering recommendations, and explaining complex concepts in simple terms. You are here to help with any task or query."
+            }
+            user_prompt = {
+                "role": "user",
+                "content": f"{gpt4_request}"  # `user_input` should be the actual input or query from the user.
+            }
+
             chat_response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system",
-                     "content": "You are an expert in analyzing logs and providing recommendations based on the log data."},
-                    {"role": "user",
-                     "content": f"Please analyze the following anonymized log data and provide your insights: {gpt4_request}"}
+                    system_prompt,
+                    user_prompt
                 ],
-                max_tokens=500  # Increased token limit for longer responses
+                max_tokens=500  # Adjust the token limit as needed
             )
             gpt4_analysis = chat_response['choices'][0]['message']['content'].strip()
             logging.info(f"GPT-4 analysis result: {gpt4_analysis}")
